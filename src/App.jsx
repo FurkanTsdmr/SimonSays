@@ -17,7 +17,7 @@ import './App.css'
     const [score,setScore] = useState(0);
     const [isPlaying,setIsPlaying] = useState(false);
     const [compArr,setCompArr] = useState([]);
-    const [useArr,setUserArr] = useState([]);
+    const [userArr,setUserArr] = useState([]);
     const [turn,setTurn] = useState(true);
 
     const handleStart = ()=>{
@@ -51,11 +51,82 @@ import './App.css'
       animateCompArr();
     }, [compArr]);
 
+    useEffect(()=>{
+      if(userArr.length===0)return;
+      if(userArr.length===compArr.length){
+        if(JSON.stringify(userArr) === JSON.stringify(compArr)){
+          setScore((prev) => prev +1);
+          setUserArr([]);
+          setTimeout(()=>{
+            computerTurn();
+          },1000);
+          setTurn(!turn);
+        }else{
+          setIsPlaying(false);
+        }
+      }
+    },[userArr]);
+
+    const handleUserClick = async(e)=>{
+      const id = parseInt(e.target.id);
+      setUserArr((prev) =>[...prev,id]);
+      const pad = document.getElementById(id);
+      pad.classList.add("active");
+      await sleep();
+      pad.classList.remove("active");
+    }
 
   return (
-    <>
+    <div className='App'>
+
+      <h2>Score:  {score}</h2>
+      {isPlaying && <p> {turn ? "Simon" : "You"} </p> }
+      {!isPlaying && (
+        <div className='start'>
+          <h2>Simon Game</h2>
+          <div className='startBtn' onClick={handleStart}>
+            Start Game
+          </div>
+        </div>
+      )}
+      {isPlaying &&(
+        <div className='board'>
+          <div className='pads'>
+            {boardItem.map((item) =>(
+              <div
+              key={item.name}
+              id={item.id}
+              className={`pad ${item.name}`}
+              onClick={handleUserClick}
+              >
+
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+
+      <div id='countdown'>
+        <div id='countdown-number'></div>
+        <svg>
+            <circle r="18" cx="20" cy="20"></circle>
+        </svg>
+      </div>
+
+
+
+
+
+
+
+
+
+
+
+
       
-     </>
+     </div>
   )
 }
 
